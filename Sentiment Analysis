@@ -1,0 +1,52 @@
+
+Sentiment Ai App
+· python
+import streamlit as st
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+
+
+# -------------------------------
+# TRAINING DATA (can be expanded)
+# -------------------------------
+texts = [
+    "I love this product", "This is amazing", "I am very happy", 
+    "I hate this", "This is terrible", "I am so sad", 
+    "It is okay", "Not bad", "Could be better"
+]
+labels = ["Positive", "Positive", "Positive", 
+          "Negative", "Negative", "Negative", 
+          "Neutral", "Neutral", "Neutral"]
+
+
+# Convert text to features
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(texts)
+
+
+# Train Naive Bayes classifier
+model = MultinomialNB()
+model.fit(X, labels)
+
+
+# -------------------------------
+# STREAMLIT APP
+# -------------------------------
+st.title("AI Sentiment Analysis App")
+st.write("Type a sentence and let AI analyze its sentiment.")
+
+
+# User input
+user_input = st.text_input("Enter your text:")
+
+
+if user_input:
+    # Transform input and predict
+    input_vec = vectorizer.transform([user_input])
+    prediction = model.predict(input_vec)[0]
+    st.subheader(f"Predicted Sentiment: {prediction}")
+
+
+    # Show probabilities
+    probs = model.predict_proba(input_vec)[0]
+    st.write({label: round(prob, 2) for label, prob in zip(model.classes_, probs)})
